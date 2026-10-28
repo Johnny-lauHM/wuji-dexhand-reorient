@@ -229,9 +229,12 @@ footer { color: var(--muted); font-size: 14px; padding: 32px 0 56px; border-top:
   <h2>使用</h2>
   <p>本仓库的目录结构和 <a href="https://github.com/wuji-technology/wuji-mjlab">wuji-mjlab</a> 一致，把它覆盖到框架根目录就能用：</p>
 <pre><code>git clone https://github.com/wuji-technology/wuji-mjlab.git
+git -C wuji-mjlab checkout 9410a3a   # 必须用这个版本
 git clone https://github.com/Johnny-lauHM/wuji-dexhand-reorient.git
-rsync -a --exclude .git wuji-dexhand-reorient/ wuji-mjlab/
+rsync -a --exclude .git --exclude README.md --exclude index.html --exclude site --exclude demos \
+  wuji-dexhand-reorient/ wuji-mjlab/
 cd wuji-mjlab &amp;&amp; pixi install
+pixi run pytest -q src/wuji_mjlab/tasks/dodecahedron/tests src/wuji_mjlab/tasks/reorient/tests
 
 # 掌心向下 teacher → 视觉学生
 pixi run python scripts/train/train_cube_downward_any_pose.py
@@ -242,7 +245,7 @@ pixi run python scripts/eval_cube_wrist_student.py
 # 十二面体
 pixi run train --task WujiHand_Dodecahedron
 pixi run python scripts/eval_apriltag_teacher.py</code></pre>
-  <p>完整说明：<a href="docs/PALM_DOWN_ANY_POSE_IMPLEMENTATION.zh-CN.md">掌心向下实现文档</a> · <a href="docs/L515_APRILTAG_TRAINING.zh-CN.md">L515 / AprilTag 训练文档</a> · <a href="src/wuji_mjlab/tasks/dodecahedron/README_zh.md">十二面体任务说明</a>。checkpoint 没有放进仓库。</p>
+  <p>完整说明：<a href="docs/PALM_DOWN_ANY_POSE_IMPLEMENTATION.zh-CN.md">掌心向下实现文档</a> · <a href="docs/L515_APRILTAG_TRAINING.zh-CN.md">L515 / AprilTag 训练文档</a> · <a href="src/wuji_mjlab/tasks/dodecahedron/README_zh.md">十二面体任务说明</a>。checkpoint 没有放进仓库，需要先自己训练。</p>
   <div class="note">以上所有数字都来自仿真，还没有在真实硬件上验证。</div>
 </section>
 

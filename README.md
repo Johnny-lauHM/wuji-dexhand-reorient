@@ -134,13 +134,18 @@ index.html, site/            项目主页（GitHub Pages）
 
 ## 使用
 
-这个仓库的目录结构和 wuji-mjlab 一致，覆盖到框架根目录就能用：
+这个仓库的目录结构和 wuji-mjlab 一致，覆盖到框架根目录就能用。**必须使用 wuji-mjlab 的 `9410a3a` 版本**，上游之后的版本改过 rsl_rl 和手部资产的结构，直接覆盖会报错。
 
 ```bash
 git clone https://github.com/wuji-technology/wuji-mjlab.git
+git -C wuji-mjlab checkout 9410a3a
 git clone https://github.com/Johnny-lauHM/wuji-dexhand-reorient.git
-rsync -a --exclude .git wuji-dexhand-reorient/ wuji-mjlab/
+rsync -a --exclude .git --exclude README.md --exclude index.html --exclude site --exclude demos \
+  wuji-dexhand-reorient/ wuji-mjlab/
 cd wuji-mjlab && pixi install
+
+# 自检：任务测试全部通过即说明环境正确
+pixi run pytest -q src/wuji_mjlab/tasks/dodecahedron/tests src/wuji_mjlab/tasks/reorient/tests
 ```
 
 ```bash
@@ -150,6 +155,7 @@ pixi run python scripts/train/train_apriltag_pose.py --smoke
 pixi run python scripts/eval_apriltag_teacher.py
 
 # 六面体 · 掌心向下：teacher → 视觉学生
+pixi run python scripts/train/train_cube_downward.py --phase hold --smoke   # 快速检查
 pixi run python scripts/train/train_cube_downward_any_pose.py
 pixi run python scripts/train/train_cube_wrist_student.py
 pixi run python scripts/train/train_cube_wrist_dagger.py
@@ -164,7 +170,7 @@ MUJOCO_GL=egl pixi run python scripts/record_cube_downward_demo.py --seconds 12 
 - [L515 / AprilTag 训练](docs/L515_APRILTAG_TRAINING.zh-CN.md)
 - [十二面体任务说明](src/wuji_mjlab/tasks/dodecahedron/README_zh.md)
 
-训练日志和 checkpoint（`*.pt`）没有放进仓库。
+训练日志和 checkpoint（`*.pt`）没有放进仓库，评估和录视频之前需要先自己训练。
 
 ## 硬件
 
