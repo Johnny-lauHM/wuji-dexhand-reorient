@@ -1,0 +1,25 @@
+{
+  "stream": "stream.color",
+  "index": 0,
+  "format": "format.rgb8",
+  "fps": 30,
+  "width": 640,
+  "height": 480,
+  "fx": 393.3367614746094,
+  "fy": 392.4486999511719,
+  "cx": 322.73553466796875,
+  "cy": 244.21871948242188,
+  "distortion_model": "distortion.inverse_brown_conrady",
+  "coeffs": [
+    -0.05373125523328781,
+    0.05656253919005394,
+    0.0001637360401218757,
+    0.0005015056813135743,
+    -0.01837330125272274
+  ],
+  "fov_deg": [
+    78.25802612304688,
+    62.889949798583984
+  ],
+  "rendering": "Pinhole simulation; real raw RGB must use matching distortion handling"
+}

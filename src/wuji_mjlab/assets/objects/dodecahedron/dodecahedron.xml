@@ -1,0 +1,18 @@
+<mujoco model="regular_dodecahedron">
+  <!--20 vertices from (±1,±1,±1), (0,±1/phi,±phi) and cyclic permutations; normalized to unit circumradius. 12 pentagons triangulated into 36 outward faces. cube names preserve the shared reorient sensor/visualizer contract.-->
+  <asset>
+    <mesh name="cube_mesh" scale="0.035 0.035 0.035" file="dodecahedron.obj" />
+    <texture name="face_labels" type="2d" file="face_labels.png" />
+    <material name="face_labels" texture="face_labels" specular="0.15" shininess="0.1" />
+  </asset>
+  <worldbody>
+    <body name="cube">
+      <freejoint name="cube_freejoint" />
+      <geom name="cube" type="mesh" mesh="cube_mesh" mass="0.120" rgba="1 1 1 1" friction="0.3" conaffinity="2" condim="3" priority="0" solref="0.015 1.0" solimp="0.85 0.85 0.001" group="0" material="face_labels" />
+      <site name="cube_center" pos="0 0 0" size="0.001" group="4" />
+      <site name="orientation_x" type="capsule" fromto="0 0 0 0.041 0.0 0.0" size="0.001" rgba="1 0.15 0.15 1" group="2" />
+      <site name="orientation_y" type="capsule" fromto="0 0 0 0.0 0.041 0.0" size="0.001" rgba="0.15 1 0.15 1" group="2" />
+      <site name="orientation_z" type="capsule" fromto="0 0 0 0.0 0.0 0.041" size="0.001" rgba="0.15 0.15 1 1" group="2" />
+    </body>
+  </worldbody>
+</mujoco>

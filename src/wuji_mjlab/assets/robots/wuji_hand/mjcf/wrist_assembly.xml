@@ -1,0 +1,31 @@
+<mujoco model="wuji_wrist_fixture">
+  <asset>
+    <mesh name="wrist_5e17d2b4a7b9c5bd" content_type="model/stl" file="5e17d2b4a7b9c5bd.stl" />
+    <mesh name="wrist_9ece831387ac3939" content_type="model/stl" file="9ece831387ac3939.stl" scale="0.001 0.001 0.001" />
+  </asset>
+  <worldbody>
+    <body name="right_connector_link" quat="0.0 0.7071067811865475 0.0 0.7071067811865475" gravcomp="1" pos="-0.04292769999999999 -0.00023384999999999994 -0.04499999999999999">
+      <inertial pos="-0.00202469 2.11956e-06 0.0349191" quat="0.999856 -1.47242e-05 0.0169483 -8.82374e-06" mass="0.118565" diaginertia="0.000139556 0.000115302 4.56705e-05" />
+      <geom pos="-0.032 -0.035 0" type="mesh" contype="0" conaffinity="0" group="1" rgba="0.24 0.47 0.67 1" density="0" mesh="wrist_9ece831387ac3939" />
+      <geom pos="-0.032 -0.035 0" type="mesh" rgba="0.24 0.47 0.67 1" mesh="wrist_9ece831387ac3939" group="3" />
+      <body name="d405_b_camera_link" pos="0.0290688 0.0 0.096478" quat="0.5254827454987588 -0.47314678925581505 -0.47314678925581505 0.5254827454987591" gravcomp="1">
+        <inertial pos="0 0 0.0115" quat="0.5 0.5 -0.5 0.5" mass="0.06" diaginertia="1.764e-05 1.1465e-05 1.1465e-05" />
+        <geom size="0.021 0.021 0.0115" pos="0 0 0.0115" type="box" contype="0" conaffinity="0" group="1" rgba="0.3 0.32 0.34 1" density="0" />
+        <geom size="0.021 0.021 0.0115" pos="0 0 0.0115" type="box" rgba="0.3 0.32 0.34 1" group="3" />
+        <geom size="0.0055 0.0001" pos="-0.009 0 -0.0002" type="cylinder" contype="0" conaffinity="0" group="1" rgba="0.015 0.025 0.035 1" density="0" />
+        <geom size="0.0055 0.0001" pos="0.009 0 -0.0002" type="cylinder" contype="0" conaffinity="0" group="1" rgba="0.015 0.025 0.035 1" density="0" />
+        <camera name="d405_b" pos="0 0 -0.001" quat="1 0 0 0" sensorsize="1 1" resolution="640 480" focalpixel="393.3367614746094 392.4486999511719" principalpixel="-3.23553466796875 -4.718719482421875" />
+      </body>
+    </body>
+    <body name="right_hand_docking_link" pos="0 0 -0.013" quat="1 0 0 0" gravcomp="1">
+      <inertial pos="0 0.000613 0.008094" quat="0.435285 0.5573 -0.557322 0.435127" mass="0.051956" diaginertia="1.93305e-05 1.81473e-05 1.72441e-05" />
+      <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.792157 0.819608 0.933333 1" density="0" mesh="wrist_5e17d2b4a7b9c5bd" />
+      <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="wrist_5e17d2b4a7b9c5bd" group="3" />
+    </body>
+  </worldbody>
+  <contact>
+    <exclude body1="right_connector_link" body2="d405_b_camera_link" />
+    <exclude body1="right_hand_docking_link" body2="right_palm_link" />
+    <exclude body1="right_connector_link" body2="right_hand_docking_link" />
+  </contact>
+</mujoco>

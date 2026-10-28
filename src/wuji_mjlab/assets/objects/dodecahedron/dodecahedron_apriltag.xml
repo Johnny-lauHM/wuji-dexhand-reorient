@@ -1,0 +1,14 @@
+<mujoco model="regular_dodecahedron">
+  <asset>
+    <mesh name="cube_mesh" scale="0.035 0.035 0.035" file="dodecahedron_apriltag.obj" />
+    <texture name="face_labels" type="2d" file="apriltag36h11.png" />
+    <material name="face_labels" texture="face_labels" specular="0" shininess="0.1" />
+  </asset>
+  <worldbody>
+    <body name="cube">
+      <freejoint name="cube_freejoint" />
+      <geom name="cube" type="mesh" mesh="cube_mesh" mass="0.120" rgba="1 1 1 1" friction="0.3" conaffinity="2" condim="3" priority="0" solref="0.015 1.0" solimp="0.85 0.85 0.001" group="0" material="face_labels" />
+      <site name="cube_center" pos="0 0 0" size="0.001" group="4" />
+    </body>
+  </worldbody>
+</mujoco>

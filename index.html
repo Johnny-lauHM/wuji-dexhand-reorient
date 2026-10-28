@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wuji Dexhand Reorient</title>
+<meta name="description" content="Wuji Hand 灵巧手：十二面体手内重定向与掌心向下任意姿态方块重定向（MuJoCo / mjlab 仿真）">
+<style>
+:root {
+  --bg: #fbfaf8; --surface: #ffffff; --text: #1d1d1f; --muted: #5f6368; --line: #e4e2dd;
+  --accent: #1f6feb; --accent-soft: #e8f0fe; --ok: #1a7f37; --warn: #9a6700; --warn-soft: #fff4d6;
+  --code-bg: #f3f2ef;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111214; --surface: #1a1b1e; --text: #e8e8ea; --muted: #a0a3a8; --line: #2c2e33;
+    --accent: #6ea8ff; --accent-soft: #1b2a44; --ok: #4ac26b; --warn: #e3b341; --warn-soft: #2d2513;
+    --code-bg: #202226;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111214; --surface: #1a1b1e; --text: #e8e8ea; --muted: #a0a3a8; --line: #2c2e33;
+  --accent: #6ea8ff; --accent-soft: #1b2a44; --ok: #4ac26b; --warn: #e3b341; --warn-soft: #2d2513;
+  --code-bg: #202226;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.7 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+header.hero { text-align: center; padding: 64px 0 32px; }
+.hero h1 { font-size: clamp(28px, 5vw, 44px); line-height: 1.2; margin: 0 0 12px; letter-spacing: -0.01em; }
+.hero .sub { color: var(--muted); font-size: 18px; margin: 0 auto 24px; max-width: 720px; }
+.btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px; border-radius: 999px;
+  background: var(--text); color: var(--bg); font-weight: 600; font-size: 15px;
+}
+.btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+.btn:hover { text-decoration: none; opacity: .88; }
+.teaser { margin: 8px 0 8px; }
+.teaser video { width: 100%; border-radius: 12px; display: block; background: #000; }
+.caption { color: var(--muted); font-size: 14px; margin-top: 8px; text-align: center; }
+section { padding: 40px 0; border-top: 1px solid var(--line); }
+section h2 { font-size: 26px; margin: 0 0 6px; }
+section h3 { font-size: 19px; margin: 28px 0 10px; }
+.lead { color: var(--muted); margin: 0 0 20px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin: 16px 0 24px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+.stat .v { font-size: 28px; font-weight: 700; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.stat .k { color: var(--muted); font-size: 13.5px; line-height: 1.45; margin-top: 4px; }
+.grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.card video, .card img { width: 100%; display: block; background: #000; }
+.card.feature { grid-column: 1 / -1; }
+.card .body { padding: 12px 14px 14px; }
+.card .t { font-weight: 600; margin-bottom: 2px; }
+.card .d { color: var(--muted); font-size: 14px; line-height: 1.55; }
+.card .d a { font-size: 13px; }
+.note {
+  background: var(--warn-soft); border-left: 3px solid var(--warn); padding: 12px 16px;
+  border-radius: 0 8px 8px 0; font-size: 15px; margin: 20px 0;
+}
+.pipeline { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0 20px; font-size: 14px; }
+.pipeline span { background: var(--accent-soft); color: var(--text); padding: 4px 10px; border-radius: 6px; }
+.pipeline i { color: var(--muted); font-style: normal; }
+table { width: 100%; border-collapse: collapse; font-size: 15px; font-variant-numeric: tabular-nums; }
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+tr:last-child td { border-bottom: none; }
+th { color: var(--muted); font-weight: 600; font-size: 13.5px; }
+td.num, th.num { text-align: right; }
+pre {
+  background: var(--code-bg); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+  overflow-x: auto; font-size: 13.5px; line-height: 1.55;
+}
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+ul.files { padding-left: 20px; margin: 8px 0; }
+ul.files li { margin: 4px 0; }
+footer { color: var(--muted); font-size: 14px; padding: 32px 0 56px; border-top: 1px solid var(--line); text-align: center; }
+@media (max-width: 520px) {
+  header.hero { padding-top: 40px; }
+  .grid { grid-template-columns: 1fr; }
+  .stat .v { font-size: 24px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>Wuji Dexhand Reorient</h1>
+  <p class="sub">Wuji Hand 灵巧手的两个手内操作任务：<b>十二面体重定向</b>，以及<b>掌心向下的方块任意姿态重定向</b>。后者已蒸馏成只用腕部相机的视觉学生策略。全部结果来自 MuJoCo / mjlab 仿真。</p>
+  <div class="btns">
+    <a class="btn" href="https://github.com/Johnny-lauHM/wuji-dexhand-reorient">GitHub 代码</a>
+    <a class="btn ghost" href="#palm-down">掌心向下</a>
+    <a class="btn ghost" href="#dodecahedron">十二面体</a>
+    <a class="btn ghost" href="#hardware">硬件</a>
+  </div>
+</header>
+
+<div class="teaser">
+  <video src="demos/visual_student/student_dual_view.mp4"
+         poster="site/assets/visual_student_student_dual_view.jpg"
+         autoplay muted loop playsinline controls preload="metadata"></video>
+  <p class="caption">视觉学生策略，掌心向下：左边是外部视角（目标、当前姿态和状态机），右边是腕部 D405 相机画面。32 秒里切换 4 个完整 SO(3) 目标，4/4 成功。</p>
+</div>
+
+<!-- ============ Palm down ============ -->
+<section id="palm-down">
+  <h2>掌心向下：方块任意姿态重定向</h2>
+  <p class="lead">手腕固定为掌心朝下，策略只控制手指，在 1g 重力下用指尖托住 45 mm 方块，连续转到随机采样的 SO(3) 目标姿态。</p>
+
+  <h3>Teacher（特权状态）</h3>
+  <div class="pipeline"><span>413 维特权仿真状态</span><i>→</i><span>PPO actor</span><i>→</i><span>手指关节目标</span></div>
+  <div class="stats">
+    <div class="stat"><div class="v">96.16%</div><div class="k">8 秒内到达目标（2682/2789，3 个种子）</div></div>
+    <div class="stat"><div class="v">95.62%</div><div class="k">初始误差 120–180° 的难目标（1636/1711）</div></div>
+    <div class="stat"><div class="v">99.48%</div><div class="k">30 秒存活率（191/192 条轨迹）</div></div>
+    <div class="stat"><div class="v">28.4</div><div class="k">每分钟完成目标数（旧模型 19.1）</div></div>
+  </div>
+  <div class="grid">
+    <div class="card feature">
+      <video src="demos/palm_down/palm_down_anypose_state_machine.mp4" poster="site/assets/demos_palm_down_palm_down_anypose_state_machine.jpg" muted loop playsinline controls preload="none"></video>
+      <div class="body"><div class="t">六面体 · 掌心向下 · 任意 SO(3) 姿态状态机</div><div class="d">APPROACH → HOLD → NEXT GOAL。上方的半透明方块是目标姿态，红/绿球表示误差是否已进入 0.2 rad 以内。另见 <a href="demos/palm_down/palm_down_spin.mp4">掌心向下旋转</a>、<a href="demos/palm_down/teacher_30s_rollout.mp4">30 秒 rollout</a>。</div></div>
+    </div>
+  </div>
+
+  <h3>视觉学生（腕部相机 + 编码器）</h3>
+  <div class="pipeline"><span>腕部 D405 RGB</span><i>→</i><span>AprilTag 36h11 + PnP</span><i>→</i><span>方块位姿</span><i>+</i><span>关节角 / 目标 / 动作历史</span><i>→</i><span>207 维学生策略</span></div>
+  <p>学生策略先用 BC 初始化，再用 DAgger 在相机闭环中微调。actor 的输入里没有物体真值和特权物理参数，真值只用来评分。腕部相机装在法兰的手侧，仰角 6°，使用 D405 的真实出厂内参（640×480）。</p>
+  <div class="tbl"><table>
+    <thead><tr><th>评估配置（16 条 × 32 秒，每 8 秒换一个目标）</th><th class="num">目标成功</th><th class="num">成功率</th><th class="num">存活率</th></tr></thead>
+    <tbody>
+      <tr><td>DAgger 学生 · 出厂 VGA 内参</td><td class="num">58 / 64</td><td class="num"><b>90.6%</b></td><td class="num">93.8%</td></tr>
+      <tr><td>DAgger 学生 · 出厂广角</td><td class="num">53 / 64</td><td class="num">82.8%</td><td class="num">81.3%</td></tr>
+      <tr><td>DAgger 学生 · 标称广角</td><td class="num">50 / 64</td><td class="num">78.1%</td><td class="num">93.8%</td></tr>
+      <tr><td>BC 初始学生</td><td class="num">48 / 64</td><td class="num">75.0%</td><td class="num">81.3%</td></tr>
+    </tbody>
+  </table></div>
+  <div class="grid" style="margin-top:18px">
+    <div class="card">
+      <video src="demos/visual_student/camera_closed_loop_factory_vga.mp4" poster="site/assets/visual_student_camera_closed_loop_factory_vga.jpg" muted loop playsinline controls preload="none"></video>
+      <div class="body"><div class="t">相机闭环（出厂 VGA）</div><div class="d">表中 90.6% 那组配置的录像。</div></div>
+    </div>
+    <div class="card">
+      <video src="demos/visual_student/integrated_external_view.mp4" poster="site/assets/visual_student_integrated_external_view.jpg" muted loop playsinline controls preload="none"></video>
+      <div class="body"><div class="t">法兰 + 手 + D405 集成环境</div><div class="d">12 秒内到达 6 个目标，指尖接触时间占 97.1%。</div></div>
+    </div>
+    <div class="card">
+      <video src="demos/visual_student/integrated_wrist_view.mp4" poster="site/assets/visual_student_integrated_wrist_view.jpg" muted loop playsinline controls preload="none"></video>
+      <div class="body"><div class="t">同一次运行的腕部相机画面</div><div class="d">这是策略的视觉输入来源。</div></div>
+    </div>
+  </div>
+
+  <h3>腕部标签跟踪：AprilTag 对比 ArUco</h3>
+  <div class="grid">
+    <div class="card">
+      <video src="demos/visual_student/wrist_tracking_apriltag.mp4" poster="site/assets/visual_student_wrist_tracking_apriltag.jpg" muted loop playsinline controls preload="none"></video>
+      <div class="body"><div class="t">AprilTag 36h11</div><div class="d">93.5% 的帧输出了位姿；检测 + PnP 中位耗时 1.42 ms；误差中位 0.33 mm / 0.38°。</div></div>
+    </div>
+    <div class="card">
+      <video src="demos/visual_student/wrist_tracking_aruco.mp4" poster="site/assets/visual_student_wrist_tracking_aruco.jpg" muted loop playsinline controls preload="none"></video>
+      <div class="body"><div class="t">ArUco 4x4_50</div><div class="d">92.7% 的帧输出了位姿；中位耗时 1.32 ms；误差中位 0.26 mm / 0.34°。</div></div>
+    </div>
+  </div>
+  <div class="note">这两组都是理想光照下单个种子的仿真测试，没有模拟曝光、运动模糊和传输延迟。两种标签都出现过 130° 以上的姿态跳变，所以学生策略里加了基于多标签一致性和运动上限的跳变过滤。</div>
+</section>
+
+<!-- ============ Dodecahedron ============ -->
+<section id="dodecahedron">
+  <h2>十二面体手内重定向</h2>
+  <p class="lead">Wuji Hand 在手内把一个十二面体连续转到随机目标朝向。十二个面上分别贴了编号和 AprilTag 标签，用于视觉位姿估计。</p>
+
+  <div class="stats">
+    <div class="stat"><div class="v">16</div><div class="k">特权 teacher 30 秒内到达的目标数，0 次终止</div></div>
+    <div class="stat"><div class="v">16/16</div><div class="k">RGB → AprilTag → 冻结 teacher，首个目标的成功数</div></div>
+    <div class="stat"><div class="v">97.7%</div><div class="k">有新鲜检测的帧占比</div></div>
+    <div class="stat"><div class="v">11.4</div><div class="k">域随机化微调后每条轨迹的平均目标数（15/16 存活）</div></div>
+  </div>
+  <div class="pipeline"><span>渲染 RGB</span><i>→</i><span>tag36h11 检测</span><i>→</i><span>标签板 PnP</span><i>→</i><span>物体位姿</span><i>→</i><span>冻结的 teacher</span></div>
+
+  <div class="grid">
+    <div class="card feature">
+      <video src="demos/dodecahedron/apriltag_teacher_status_demo.mp4" poster="site/assets/demos_dodecahedron_apriltag_teacher_status_demo.jpg" muted loop playsinline controls preload="none"></video>
+      <div class="body"><div class="t">十二面体 · 掌心向上 · AprilTag 视觉 + 状态机</div><div class="d">RGB → AprilTag 36h11 → 标签板 PnP → 冻结的 teacher。上方小球是状态灯：红=还没到达目标，绿=已进入成功阈值，之后切换到下一个目标。观测里的物体状态全部来自视觉估计。</div></div>
+    </div>
+    <div class="card">
+      <video src="demos/dodecahedron/teacher_numbered_demo.mp4" poster="site/assets/demos_dodecahedron_teacher_numbered_demo.jpg" muted loop playsinline controls preload="none"></video>
+      <div class="body"><div class="t">Teacher：带编号的十二面体</div><div class="d">绿色球表示目标朝向。另见 <a href="demos/dodecahedron/teacher_final_demo.mp4">final demo</a>。</div></div>
+    </div>
+    <div class="card">
+      <video src="demos/dodecahedron/teacher_ckpt3900_rotation_20s.mp4" poster="site/assets/demos_dodecahedron_teacher_ckpt3900_rotation_20s.jpg" muted loop playsinline controls preload="none"></video>
+      <div class="body"><div class="t">训练中期 checkpoint（3900 轮）</div><div class="d">20 秒连续旋转。</div></div>
+    </div>
+  </div>
+
+  <div class="note"><b>负结果：</b>直接用 AprilTag 视觉观测从头训练 PPO（约 5000 轮，耗时 6.6 小时），感知链路的检测接受率有 99.5%，但策略没有收敛：独立评估中首目标成功 <b>0/16</b>（<a href="demos/dodecahedron/apriltag_ppo_unconverged_demo.mp4">录像</a>）。所以最后采用“特权 teacher + 视觉位姿输入”的方案。</div>
+</section>
+
+<!-- ============ Hardware ============ -->
+<section id="hardware">
+  <h2>硬件与装配</h2>
+  <div class="grid">
+    <div class="card">
+      <img src="site/assets/assembly.png" alt="Franka 法兰、Wuji Hand 与腕部 D405 相机的仿真装配" loading="lazy">
+      <div class="body"><div class="t">Franka 法兰 + Wuji Hand + D405</div><div class="d">从整机装配中提取法兰、手和相机，相对位姿与原装配一致。</div></div>
+    </div>
+    <div class="card">
+      <div class="body">
+        <div class="t">可打印文件</div>
+        <ul class="files d">
+          <li><a href="hardware/palm_down_cube_45mm/cube45_hollow_body_wall1p6mm.stl">45 mm 空心方块主体 STL</a> 和 <a href="hardware/palm_down_cube_45mm/cube45_lid_1p6mm.stl">盖子</a></li>
+          <li><a href="hardware/palm_down_cube_45mm/cube45_face_stickers_A4.pdf">方块各面的标签贴纸（A4）</a></li>
+          <li><a href="hardware/palm_down_cube_45mm/wrist_apriltag36h11_ID0_48mm_A4.pdf">腕部 AprilTag（48 mm）</a></li>
+          <li><a href="src/wuji_mjlab/assets/objects/dodecahedron/apriltag_print_A4.svg">十二面体 AprilTag 打印稿</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Usage ============ -->
+<section id="usage">
+  <h2>使用</h2>
+  <p>本仓库的目录结构和 <a href="https://github.com/wuji-technology/wuji-mjlab">wuji-mjlab</a> 一致，把它覆盖到框架根目录就能用：</p>
+<pre><code>git clone https://github.com/wuji-technology/wuji-mjlab.git
+git clone https://github.com/Johnny-lauHM/wuji-dexhand-reorient.git
+rsync -a --exclude .git wuji-dexhand-reorient/ wuji-mjlab/
+cd wuji-mjlab &amp;&amp; pixi install
+
+# 掌心向下 teacher → 视觉学生
+pixi run python scripts/train/train_cube_downward_any_pose.py
+pixi run python scripts/train/train_cube_wrist_student.py
+pixi run python scripts/train/train_cube_wrist_dagger.py
+pixi run python scripts/eval_cube_wrist_student.py
+
+# 十二面体
+pixi run train --task WujiHand_Dodecahedron
+pixi run python scripts/eval_apriltag_teacher.py</code></pre>
+  <p>完整说明：<a href="docs/PALM_DOWN_ANY_POSE_IMPLEMENTATION.zh-CN.md">掌心向下实现文档</a> · <a href="docs/L515_APRILTAG_TRAINING.zh-CN.md">L515 / AprilTag 训练文档</a> · <a href="src/wuji_mjlab/tasks/dodecahedron/README_zh.md">十二面体任务说明</a>。checkpoint 没有放进仓库。</p>
+  <div class="note">以上所有数字都来自仿真，还没有在真实硬件上验证。</div>
+</section>
+
+<footer>
+  基于 <a href="https://github.com/wuji-technology/wuji-mjlab">wuji-mjlab</a>（Apache-2.0）与 rsl_rl 构建 · Johnny-lauHM · 2026
+</footer>
+</div>
+<script>
+// Play videos only while visible, to keep bandwidth and CPU down.
+(function () {
+  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      var v = e.target;
+      if (e.isIntersecting) { if (v.preload === 'none') v.preload = 'metadata'; v.play().catch(function () {}); }
+      else v.pause();
+    });
+  }, { threshold: 0.35 });
+  document.querySelectorAll('video').forEach(function (v) { io.observe(v); });
+})();
+</script>
+</body>
+</html>

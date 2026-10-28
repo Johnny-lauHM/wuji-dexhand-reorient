@@ -1,0 +1,3 @@
+# Optional generation/verification dependency; the rendered RGB-D trainer does
+# not import OpenCV. Install after scripts/requirements-dodecahedron.txt.
+opencv-contrib-python-headless==4.11.0.86

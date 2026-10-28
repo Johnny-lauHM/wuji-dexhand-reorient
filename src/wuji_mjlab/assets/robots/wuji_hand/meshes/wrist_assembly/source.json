@@ -1,0 +1,47 @@
+{
+  "source_scene": "Franka + Wuji Hand + D405 assembly scene (not included)",
+  "source_palm_to_connector_pos_m": [
+    -0.04292769999999999,
+    -0.00023384999999999994,
+    -0.04499999999999999
+  ],
+  "source_palm_to_connector_rotation": [
+    [
+      0.0,
+      0.0,
+      0.9999999999999998
+    ],
+    [
+      0.0,
+      -0.9999999999999998,
+      0.0
+    ],
+    [
+      0.9999999999999998,
+      0.0,
+      0.0
+    ]
+  ],
+  "hand_model": "Use canonical trained hand, not source assembly hand (different inertias).",
+  "camera": "D405 intrinsics preserved; optical pitch set for the fixed palm-down mount and backed off along optical axis.",
+  "camera_mount_reference": "Source assembly hand-side bracket; no additional backoff by default",
+  "camera_intrinsics_source": "src/wuji_mjlab/assets/robots/wuji_hand/meshes/wrist_assembly/camera_calibration.json",
+  "camera_pitch_deg": 6.0,
+  "pitch_reference": "Optical elevation in the fixed R_y(+90) palm-down world",
+  "camera_backoff_mm": 0.0,
+  "original_camera_pos_connector_m": [
+    0.0290688,
+    0.0,
+    0.096478
+  ],
+  "camera_delta_connector_m": [
+    -0.0,
+    0.0,
+    0.0
+  ],
+  "camera_pos_connector_m": [
+    0.0290688,
+    0.0,
+    0.096478
+  ]
+}
